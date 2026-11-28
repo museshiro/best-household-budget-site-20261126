@@ -3,353 +3,437 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Anggaran Rumah Tangga Kita — Kalkulator Anggaran Keluarga Indonesia</title>
-<meta name="description" content="Situs anggaran rumah tangga Indonesia: kalkulator 50/30/20, dana darurat, KPR, zakat, inflasi, pelunasan utang, tracker pengeluaran, dan laporan bulanan. Semua data tersimpan lokal di browser.">
+<meta name="description" content="Anggaran Rumah Tangga Kita — buku kas keluarga: 10 kalkulator, tracker transaksi, dan grafik anggaran keluarga 4 orang di Jakarta. Semua data tersimpan lokal di browser.">
+<title>Anggaran Rumah Tangga Kita — buku kas keluarga</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="situs">
-  <div class="lebar">
-    <h1>Anggaran Rumah Tangga Kita</h1>
-    <p class="tagline">Anggaran keluarga Indonesia yang jujur angkanya: pemasukan, kebutuhan, tabungan, dan utang — semua bisa dihitung di sini.</p>
-    <div class="tombol-atas">
-      <button type="button" id="btn-contoh-atas">Muat Data Contoh</button>
-      <button type="button" id="btn-reset-atas" class="sekunder">Reset Data</button>
-    </div>
+<a class="skip-link" href="#dashboard">Lewati ke konten</a>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="wordmark" href="#dashboard"><strong>Anggaran Rumah Tangga</strong><span>buku kas keluarga · Jakarta</span></a>
+    <nav class="main-nav" aria-label="Navigasi utama">
+      <a href="#dashboard"><b>01</b>Dashboard</a>
+      <a href="#setup"><b>02</b>Atur Pemasukan</a>
+      <a href="#anggaran"><b>03</b>Anggaran 50/30/20</a>
+      <a href="#tracker"><b>04</b>Tracker</a>
+      <a href="#grafik"><b>05</b>Grafik</a>
+      <a href="#kalkulator"><b>06</b>Kalkulator</a>
+      <a href="#laporan"><b>07</b>Laporan</a>
+      <a href="#tips"><b>08</b>Tips Hemat</a>
+    </nav>
   </div>
 </header>
 
-<nav class="utama" aria-label="Navigasi utama">
-  <div class="lebar">
-    <ul>
-      <li><a href="#dashboard">Dashboard</a></li>
-      <li><a href="#setup">Atur Pemasukan</a></li>
-      <li><a href="#anggaran">Anggaran 50/30/20</a></li>
-      <li><a href="#tracker">Tracker</a></li>
-      <li><a href="#grafik">Grafik</a></li>
-      <li><a href="#kalkulator">Kalkulator</a></li>
-      <li><a href="#laporan">Laporan</a></li>
-      <li><a href="#tips">Tips Hemat</a></li>
-    </ul>
+<main id="main">
+<!-- ================= 01 DASHBOARD ================= -->
+<section id="dashboard" aria-labelledby="h-dashboard">
+  <div class="wrap">
+    <p class="banner" id="sample-banner" hidden>Data contoh dimuat — ubah sesukamu, tersimpan otomatis di browser.</p>
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">01 · Ringkasan · November 2026</p>
+        <h1 id="h-dashboard">Ke mana <span class="hl">Rp18,5 juta</span> pergi setiap bulan?</h1>
+        <p class="lede">Keluarga 4 orang di Jakarta, dua anak, satu tujuan: semua uang jelas arahnya. Semua angka di bawah bisa Anda ubah, dan semua tool ikut berhitung.</p>
+        <p class="chips">
+          <span class="chip">2 sumber gaji</span>
+          <span class="chip">8 kategori</span>
+          <span class="chip">20 transaksi</span>
+          <span class="chip">10 kalkulator</span>
+          <span class="chip">100% data lokal di browser</span>
+        </p>
+      </div>
+      <div class="kas" role="group" aria-label="Papan kas November 2026">
+        <div>
+          <p class="kas-label">Pemasukan · November 2026</p>
+          <p class="kas-big" id="kas-income">Rp18.500.000</p>
+          <p class="kas-sub" id="kas-sources">gaji suami Rp12.000.000 · gaji istri Rp6.500.000</p>
+        </div>
+        <div class="kas-tiles">
+          <div class="kas-tile">
+            <p class="t-label">Belanja (di luar tabungan)</p>
+            <p class="t-num" id="kas-belanja">Rp14.450.000</p>
+            <p class="t-pct" id="kas-belanja-pct">78,1%</p>
+          </div>
+          <div class="kas-tile">
+            <p class="t-label">Zakat &amp; sedekah</p>
+            <p class="t-num" id="kas-zakat">Rp500.000</p>
+            <p class="t-pct" id="kas-zakat-pct">2,7%</p>
+          </div>
+          <div class="kas-tile">
+            <p class="t-label">Ditabung</p>
+            <p class="t-num" id="kas-tabung">Rp3.350.000</p>
+            <p class="t-pct" id="kas-tabung-pct">18,1%</p>
+          </div>
+          <div class="kas-tile">
+            <p class="t-label">Sisa fleksibel</p>
+            <p class="t-num" id="kas-fleksibel">Rp200.000</p>
+            <p class="t-pct" id="kas-fleksibel-pct">1,1%</p>
+          </div>
+        </div>
+        <div class="kas-total"><span>Total aliran</span><strong id="kas-total">Rp18.500.000</strong></div>
+      </div>
+    </div>
+
+    <div class="kpi-strip">
+      <a class="card kpi" href="#anggaran">
+        <p class="kpi-label">Skor kesehatan anggaran</p>
+        <div class="kpi-top">
+          <svg class="kpi-ring" width="84" height="84" viewBox="0 0 84 84" role="img" aria-label="Skor kesehatan 70 dari 100">
+            <circle cx="42" cy="42" r="40" fill="none" stroke="#E4DCC6" stroke-width="7"></circle>
+            <circle id="kpi-ring-fg" cx="42" cy="42" r="40" fill="none" stroke="#2D7A4F" stroke-width="7" stroke-linecap="round" stroke-dasharray="175.7 251.2" transform="rotate(-90 42 42)"></circle>
+          </svg>
+          <div>
+            <p class="kpi-num"><span id="kpi-score">70</span> <small>/ 100</small></p>
+            <p class="kpi-note"><span id="kpi-score-label">Cukup</span> — target 80 agar aman</p>
+          </div>
+        </div>
+      </a>
+      <a class="card kpi" href="#kalkulator">
+        <p class="kpi-label">Dana darurat</p>
+        <p class="kpi-num"><span id="kpi-darurat">Rp24.000.000</span></p>
+        <p class="kpi-note" id="kpi-darurat-target">dari Rp81.300.000 (6× belanja)</p>
+        <div class="kpi-bar" role="img" aria-label="Dana darurat 29,5 persen dari target"><div id="kpi-darurat-bar" style="width:29.5%"></div></div>
+        <p class="kpi-note"><span id="kpi-darurat-pct">29,5%</span> · <span id="kpi-darurat-note">≈58 bulan lagi bila menabung Rp1 jt/bln</span></p>
+      </a>
+      <a class="card kpi" href="#anggaran">
+        <p class="kpi-label">Pilar di atas target</p>
+        <p class="kpi-num"><span id="kpi-pilar">1 dari 3</span></p>
+        <p class="kpi-note" id="kpi-pilar-note">Kebutuhan over Rp4.300.000 dari target 50%</p>
+      </a>
+    </div>
+
+    <div class="card">
+      <h3>Anggaran vs aktual bulan ini</h3>
+      <div id="budget-bars" aria-live="polite"></div>
+      <p class="caption">Semua kategori pas dengan anggaran bulan ini — yang over adalah pilar Kebutuhan terhadap target 50/30/20, lihat skor di atas.</p>
+    </div>
+
+    <article id="rencana-aksi" aria-labelledby="h-aksi" style="margin-top:24px">
+      <p class="eyebrow">Rencana Aksi Bulan Ini</p>
+      <h2 id="h-aksi">Empat langkah kecil, bulan depan terasa</h2>
+      <p class="lede">Setiap aksi dihitung dari angka keluarga ini — tekan “Terapkan ke Kalkulator” untuk melihat hitungannya berubah.</p>
+      <div class="action-grid" id="action-grid"></div>
+    </article>
+
+    <div style="margin-top:24px">
+      <p class="eyebrow">Pratinjau Grafik</p>
+      <div class="preview-grid">
+        <div class="card chart-card">
+          <h3>Ke mana perginya Rp18.500.000?</h3>
+          <canvas id="chart-donut-mini" role="img" aria-label="Donut komposisi outflow: Kebutuhan 73,2 persen, Tabungan 18,1 persen, Keinginan 4,9 persen, Zakat 2,7 persen, Belum teralokasi 1,1 persen"></canvas>
+          <p class="chart-fallback">Kebutuhan Rp13.550.000 (73,2%) · Tabungan Rp3.350.000 (18,1%) · Keinginan Rp900.000 (4,9%) · Zakat Rp500.000 (2,7%) · Belum teralokasi Rp200.000 (1,1%).</p>
+        </div>
+        <div class="card chart-card">
+          <h3>Kebutuhan over Rp4,3jt · keinginan hemat Rp4,65jt · tabungan kurang Rp0,35jt</h3>
+          <canvas id="chart-target-mini" role="img" aria-label="Bar target vs aktual 50/30/20: kebutuhan target 9,25 juta aktual 13,55 juta, keinginan target 5,55 juta aktual 0,9 juta, tabungan target 3,7 juta aktual 3,35 juta"></canvas>
+          <p class="chart-fallback">Target 50/30/20: Kebutuhan Rp9.250.000 vs aktual Rp13.550.000 · Keinginan Rp5.550.000 vs Rp900.000 · Tabungan Rp3.700.000 vs Rp3.350.000.</p>
+          <a class="chart-link" href="#grafik">Lihat semua grafik →</a>
+        </div>
+      </div>
+      <p class="caption mono">Data keluarga fiktif · semua Rupiah diformat id-ID · disimpan di localStorage ahrt-* Anda sendiri · tidak ada permintaan jaringan.</p>
+    </div>
   </div>
-</nav>
+</section>
 
-<main class="lebar">
-  <p class="banner" id="banner-contoh">Data contoh dimuat — ubah sesukamu, tersimpan otomatis di browser.</p>
-
-  <!-- 1. DASHBOARD -->
-  <section class="blok" id="dashboard" aria-labelledby="judul-dashboard">
-    <h2 id="judul-dashboard">Dashboard Ringkasan</h2>
-    <p class="intro">Keluarga dengan 2 anak di Jakarta. Pemasukan dan pengeluaran bulan November 2026, dihitung langsung dari data yang kamu atur dan dari tracker di bawah.</p>
-    <div class="grid">
-      <article class="kartu kpi"><p class="label">Pemasukan / bulan</p><p class="angka" id="kpi-pemasukan" aria-live="polite">—</p><p class="sub">Gaji suami + gaji istri</p></article>
-      <article class="kartu kpi"><p class="label">Pengeluaran / bulan</p><p class="angka" id="kpi-pengeluaran" aria-live="polite">—</p><p class="sub">Total outflow dari tracker</p></article>
-      <article class="kartu kpi"><p class="label">Sisa</p><p class="angka" id="kpi-sisa" aria-live="polite">—</p><p class="sub" id="kpi-sisa-sub">Pemasukan dikurangi pengeluaran</p></article>
-      <article class="kartu kpi"><p class="label">Tabungan &amp; investasi</p><p class="angka" id="kpi-tabungan" aria-live="polite">—</p><p class="sub" id="kpi-tabungan-sub">Dari pemasukan</p></article>
+<!-- ================= 02 SETUP ================= -->
+<section id="setup" aria-labelledby="h-setup">
+  <div class="wrap">
+    <p class="eyebrow">02 · Pemasukan</p>
+    <h2 id="h-setup">Atur Pemasukan</h2>
+    <p class="lede">Dua sumber gaji keluarga ini. Ubah angkanya — dashboard, skor, dan semua kalkulator ikut berhitung ulang.</p>
+    <div class="card" style="max-width:640px">
+      <form id="setup-form">
+        <label class="field"><span>Gaji suami (Rp/bulan)</span>
+          <input type="number" id="in-suami" min="0" step="1000" value="12000000">
+        </label>
+        <label class="field"><span>Gaji istri — guru + freelance (Rp/bulan)</span>
+          <input type="number" id="in-istri" min="0" step="1000" value="6500000">
+        </label>
+        <p class="error" id="setup-error" aria-live="polite"></p>
+        <button class="btn" type="submit">Simpan Pemasukan</button>
+        <button class="btn secondary" type="button" id="reset-data">Reset ke Data Contoh</button>
+        <p class="status" id="setup-status" aria-live="polite"></p>
+      </form>
     </div>
-    <div class="grid grid-2">
-      <article class="kartu">
-        <h3>Skor Kesehatan Anggaran</h3>
-        <p class="skor-besar" id="skor-angka" aria-live="polite">—</p>
-        <p class="label-skor" id="skor-label">—</p>
-        <p id="skor-diagnosis">—</p>
-        <p class="netral">Skor 80–100 Sehat · 60–79 Cukup · 40–59 Waspada · di bawah 40 Kritis. Dikurangi 30 poin bila kebutuhan di atas 60% gaji, 20 poin bila tabungan di bawah 10%, 15 poin bila ada kategori over 120% anggaran, dan 10 poin bila sisa negatif.</p>
-      </article>
-      <article class="kartu">
-        <h3>Peringatan</h3>
-        <div class="peringatan" id="peringatan-overbudget">
-          <strong>Kebutuhan terlalu besar.</strong> <span id="peringatan-teks">Kebutuhan mencapai 73,2% dari pemasukan — jauh di atas batas sehat 50%. Pendorong utamanya cicilan KPR Rp3.200.000/bulan.</span>
-        </div>
-        <div class="peringatan" id="peringatan-sisa" hidden>
-          <strong>Sisa negatif.</strong> Pengeluaran bulan ini melebihi pemasukan. Kurangi pos keinginan dulu, lalu tinjau langganan dan belanja mingguan.
-        </div>
-        <p id="peringatan-ok">Tidak ada peringatan kritis selain pos kebutuhan yang perlu ditinjau. Anggaran bulan ini seimbang: pemasukan sama dengan pengeluaran.</p>
-        <p class="catatan" style="margin-top:12px;"><strong>Dana pensiun: masih ada gap.</strong> Idealnya 30% gaji disiapkan untuk pensiun — saat ini baru 18,1% yang masuk tabungan &amp; investasi. Naikkan bertahap 1% per tahun sampai mendekati target.</p>
-      </article>
-    </div>
-  </section>
+  </div>
+</section>
 
-  <!-- 2. SETUP -->
-  <section class="blok" id="setup" aria-labelledby="judul-setup">
-    <h2 id="judul-setup">Atur Pemasukan &amp; Target</h2>
-    <p class="intro">Ubah angka sesuai keluargamu, lalu tekan Simpan. Semua tersimpan di browser (localStorage) dan dipakai semua kalkulator di halaman ini.</p>
-    <form id="form-setup" class="kartu" novalidate>
-      <div class="baris">
-        <div class="field"><label for="setup-gaji-suami">Gaji suami / bulan (Rp)</label><input type="number" id="setup-gaji-suami" min="0" step="1000" value="12000000"></div>
-        <div class="field"><label for="setup-gaji-istri">Gaji istri / bulan (Rp)</label><input type="number" id="setup-gaji-istri" min="0" step="1000" value="6500000"><span class="hint">Guru + freelance</span></div>
-        <div class="field"><label for="setup-lain">Pemasukan lain / bulan (Rp)</label><input type="number" id="setup-lain" min="0" step="1000" value="0"></div>
+<!-- ================= 03 ANGGARAN ================= -->
+<section id="anggaran" aria-labelledby="h-anggaran">
+  <div class="wrap">
+    <p class="eyebrow">03 · Anggaran</p>
+    <h2 id="h-anggaran">Anggaran 50/30/20</h2>
+    <p class="lede">Aturan klasik: 50% kebutuhan, 30% keinginan, 20% tabungan. Keluarga ini belum sampai — kebutuhan menelan 73,2% gaji, sebagian besar karena cicilan KPR.</p>
+    <div class="calc-grid">
+      <div class="card calc-card" id="kalk-5320">
+        <p class="eyebrow">Kalkulator 1 · 50/30/20</p>
+        <h3>Target vs aktual</h3>
+        <form onsubmit="return false">
+          <label class="field"><span>Gaji bulanan (Rp)</span>
+            <input type="number" id="in-gaji5320" min="1" step="1000" value="18500000">
+          </label>
+          <p class="error" id="err-5320" aria-live="polite"></p>
+        </form>
+        <div class="calc-out" id="out-5320" aria-live="polite"></div>
       </div>
-      <div class="baris">
-        <div class="field"><label for="setup-bulan-darurat">Target dana darurat (bulan pengeluaran esensial)</label>
-          <select id="setup-bulan-darurat"><option value="3">3 bulan</option><option value="6" selected>6 bulan</option><option value="9">9 bulan</option><option value="12">12 bulan</option></select></div>
-        <div class="field"><label for="setup-target-tabungan">Target tabungan pendidikan (Rp)</label><input type="number" id="setup-target-tabungan" min="0" step="100000" value="120000000"></div>
-        <div class="field"><label for="setup-tahun-pendidikan">Jangka waktu pendidikan (tahun)</label><input type="number" id="setup-tahun-pendidikan" min="1" max="20" step="1" value="5"></div>
-      </div>
-      <p class="error" id="setup-error" aria-live="polite"></p>
-      <div class="aksi">
-        <button type="submit">Simpan</button>
-        <button type="button" id="btn-contoh" class="sekunder">Muat Data Contoh</button>
-        <button type="button" id="btn-reset" class="bahaya">Reset Data</button>
-      </div>
-      <p class="netral" id="setup-status" aria-live="polite"></p>
-    </form>
-  </section>
-
-  <!-- 3. ANGGARAN 50/30/20 -->
-  <section class="blok" id="anggaran" aria-labelledby="judul-anggaran">
-    <h2 id="judul-anggaran">Kalkulator Anggaran 50/30/20</h2>
-    <p class="intro">Aturan klasik: 50% kebutuhan, 30% keinginan, 20% tabungan. Keluarga contoh ini jujur-jujuran: kebutuhannya 73,2% karena cicilan KPR — dan itu terlihat jelas di bawah.</p>
-    <div class="grid grid-2">
-      <article class="kartu" aria-labelledby="judul-pilar">
-        <h3 id="judul-pilar">Target vs Aktual</h3>
-        <div class="pilar">
-          <div class="baris-pilar"><span><strong>Kebutuhan</strong> — target <span id="pilar-kebutuhan-target">Rp9.250.000</span></span><span id="pilar-kebutuhan-aktual">Rp13.550.000 (73,2%)</span></div>
-          <div class="bar-luar"><div class="bar-dalam over" id="bar-kebutuhan" style="width:73%"></div></div>
-          <p id="pilar-kebutuhan-status" class="buruk" aria-live="polite">Over Rp4.300.000 dari target</p>
-        </div>
-        <div class="pilar">
-          <div class="baris-pilar"><span><strong>Keinginan</strong> — target <span id="pilar-keinginan-target">Rp5.550.000</span></span><span id="pilar-keinginan-aktual">Rp900.000 (4,9%)</span></div>
-          <div class="bar-luar"><div class="bar-dalam" id="bar-keinginan" style="width:5%"></div></div>
-          <p id="pilar-keinginan-status" class="baik" aria-live="polite">Di bawah target Rp4.650.000 — hemat di sini</p>
-        </div>
-        <div class="pilar">
-          <div class="baris-pilar"><span><strong>Tabungan</strong> — target <span id="pilar-tabungan-target">Rp3.700.000</span></span><span id="pilar-tabungan-aktual">Rp3.350.000 (18,1%)</span></div>
-          <div class="bar-luar"><div class="bar-dalam waspada" id="bar-tabungan" style="width:18%"></div></div>
-          <p id="pilar-tabungan-status" aria-live="polite">Kurang Rp350.000 dari target</p>
-        </div>
-        <p class="netral">Zakat &amp; sedekah Rp500.000 dan dana fleksibel Rp200.000 ditampilkan di luar tiga pilar: zakat adalah kewajiban agama, sedangkan dana fleksibel adalah kas yang belum dialokasikan.</p>
-        <p><strong>Saran otomatis:</strong> <span id="saran-503020" aria-live="polite">Kebutuhan 73,2% terlalu besar — didorong cicilan KPR. Pertahankan keinginan tetap rendah dan naikkan tabungan bertahap Rp100.000/bulan sampai mencapai 20%.</span></p>
-      </article>
-      <article class="kartu">
-        <h3>Rincian Anggaran per Kategori</h3>
-        <div class="tabel-bungkus">
-          <table>
-            <caption class="visually-hidden">Rincian anggaran bulanan per kategori</caption>
-            <thead><tr><th scope="col">Kelompok</th><th scope="col">Kategori</th><th scope="col" class="angka">Nominal</th><th scope="col" class="angka">%</th></tr></thead>
-            <tbody id="anggaran-tbody"></tbody>
-            <tfoot><tr class="total"><td colspan="2">Total outflow</td><td class="angka" id="anggaran-total">Rp18.500.000</td><td class="angka">100%</td></tr></tfoot>
+      <div class="card">
+        <p class="eyebrow">Tabel Anggaran</p>
+        <h3>Semua pos, November 2026</h3>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Kategori</th><th>Pilar</th><th>Anggaran</th><th>Aktual</th><th>Sisa</th></tr></thead>
+            <tbody id="budget-body"></tbody>
           </table>
         </div>
-        <p class="netral">Total outflow sama persis dengan pemasukan Rp18.500.000 — sisa Rp0. Setiap rupiah sudah punya tempat.</p>
-      </article>
+        <p class="caption">Aktual dihitung dari 20 transaksi tercatat di Tracker. Total anggaran Rp18.500.000 — pas dengan pemasukan.</p>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- 4. TRACKER -->
-  <section class="blok" id="tracker" aria-labelledby="judul-tracker">
-    <h2 id="judul-tracker">Tracker Pengeluaran</h2>
-    <p class="intro">Catat setiap pemasukan dan pengeluaran. Data tersimpan di browser dan langsung mengubah dashboard, grafik, dan laporan.</p>
-    <form id="form-transaksi" class="kartu" novalidate>
-      <div class="baris">
-        <div class="field"><label for="tr-tanggal">Tanggal</label><input type="date" id="tr-tanggal" value="2026-11-26" required></div>
-        <div class="field"><label for="tr-jenis">Jenis</label><select id="tr-jenis"><option value="pengeluaran">Pengeluaran</option><option value="pemasukan">Pemasukan</option></select></div>
-        <div class="field"><label for="tr-kelompok">Kelompok</label><select id="tr-kelompok"><option>Kebutuhan</option><option>Keinginan</option><option>Kewajiban</option><option>Tabungan</option><option>Fleksibel</option><option>Pendapatan</option></select></div>
+<!-- ================= 04 TRACKER ================= -->
+<section id="tracker" aria-labelledby="h-tracker">
+  <div class="wrap">
+    <p class="eyebrow">04 · Transaksi</p>
+    <h2 id="h-tracker">Tracker Transaksi</h2>
+    <p class="lede">Catat pemasukan dan belanja. Semua tersimpan di browser Anda sendiri — tambah, ubah, atau hapus kapan saja.</p>
+    <div class="card" style="margin-bottom:16px">
+      <h3 id="tx-form-title">Tambah transaksi</h3>
+      <form id="tx-form">
+        <div class="toolbar">
+          <label class="field"><span>Tanggal</span>
+            <input type="date" id="tx-date" value="2026-11-30">
+          </label>
+          <label class="field"><span>Keterangan</span>
+            <input type="text" id="tx-desc" placeholder="cth. Belanja dapur mingguan 5" maxlength="80">
+          </label>
+          <label class="field"><span>Kelompok</span>
+            <select id="tx-group">
+              <option>Pendapatan</option><option selected>Kebutuhan</option><option>Keinginan</option>
+              <option>Kewajiban</option><option>Tabungan</option><option>Fleksibel</option>
+            </select>
+          </label>
+          <label class="field"><span>Kategori</span>
+            <input type="text" id="tx-category" placeholder="cth. Makan &amp; minum (belanja dapur)" maxlength="80">
+          </label>
+          <label class="field"><span>Jenis</span>
+            <select id="tx-kind"><option value="out" selected>Keluar</option><option value="in">Masuk</option></select>
+          </label>
+          <label class="field"><span>Nominal (Rp)</span>
+            <input type="number" id="tx-amount" min="1" step="500" placeholder="1100000">
+          </label>
+        </div>
+        <p class="error" id="tx-error" aria-live="polite"></p>
+        <button class="btn" type="submit" id="tx-submit">Tambah Transaksi</button>
+      </form>
+    </div>
+    <div class="card">
+      <div class="toolbar">
+        <label class="field"><span>Filter kelompok</span>
+          <select id="filter-group">
+            <option value="semua" selected>Semua kelompok</option>
+            <option>Pendapatan</option><option>Kebutuhan</option><option>Keinginan</option>
+            <option>Kewajiban</option><option>Tabungan</option><option>Fleksibel</option>
+          </select>
+        </label>
+        <label class="field"><span>Filter bulan</span>
+          <select id="filter-month">
+            <option value="semua" selected>Semua bulan</option>
+            <option value="2026-11">November 2026</option>
+          </select>
+        </label>
+        <span class="summary-line" id="tx-count" aria-live="polite">20 transaksi</span>
       </div>
-      <div class="baris">
-        <div class="field"><label for="tr-kategori">Kategori</label><input type="text" id="tr-kategori" placeholder="cth. Makan &amp; minum" required></div>
-        <div class="field"><label for="tr-keterangan">Keterangan</label><input type="text" id="tr-keterangan" placeholder="cth. Belanja dapur mingguan 5"></div>
-        <div class="field"><label for="tr-nominal">Nominal (Rp)</label><input type="number" id="tr-nominal" min="1" step="500" placeholder="100000" required></div>
-      </div>
-      <p class="error" id="tr-error" aria-live="polite"></p>
-      <div class="aksi">
-        <button type="submit" id="btn-tambah">Tambah Transaksi</button>
-        <button type="button" id="btn-batal-edit" class="sekunder" hidden>Batal Edit</button>
-      </div>
-    </form>
-    <div class="kartu">
-      <div class="baris" style="display:flex; flex-wrap:wrap; gap:14px;">
-        <div class="field"><label for="filter-kelompok">Filter kelompok</label><select id="filter-kelompok"><option value="">Semua kelompok</option><option>Kebutuhan</option><option>Keinginan</option><option>Kewajiban</option><option>Tabungan</option><option>Fleksibel</option><option>Pendapatan</option></select></div>
-        <div class="field"><label for="filter-bulan">Filter bulan</label><select id="filter-bulan"><option value="">Semua bulan</option><option value="2026-11" selected>November 2026</option></select></div>
-      </div>
-      <div class="tabel-bungkus">
-        <table>
-          <caption class="visually-hidden">Daftar transaksi</caption>
-          <thead><tr><th scope="col">Tanggal</th><th scope="col">Keterangan</th><th scope="col">Kelompok</th><th scope="col" class="angka">Nominal</th><th scope="col">Aksi</th></tr></thead>
-          <tbody id="tracker-tbody"></tbody>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kelompok</th><th>Kategori</th><th>Jenis</th><th>Nominal</th><th>Aksi</th></tr></thead>
+          <tbody id="tx-body"></tbody>
+          <tfoot><tr>
+            <td colspan="5">Belanja + tabungan + zakat (total keluar)</td>
+            <td class="num" id="tx-out">Rp18.500.000</td><td></td>
+          </tr></tfoot>
         </table>
       </div>
-      <p><strong>Total berjalan:</strong> pemasukan <span id="tracker-total-masuk" aria-live="polite">—</span> − pengeluaran <span id="tracker-total-keluar" aria-live="polite">—</span> = <strong id="tracker-sisa" aria-live="polite">—</strong>. <span id="tracker-jumlah">20 transaksi</span> ditampilkan.</p>
-      <p class="netral">Total per kategori dihitung ulang dari data yang sedang difilter. Klik Edit untuk mengisi form dari baris itu; hapus meminta konfirmasi dulu.</p>
+      <p class="summary-line">Pemasukan: <b id="tx-in">Rp18.500.000</b> · Sisa (pemasukan − total keluar): <b id="tx-sisa">Rp0</b></p>
+      <ul class="per-group" id="tx-per-group"></ul>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- 5. GRAFIK -->
-  <section class="blok" id="grafik" aria-labelledby="judul-grafik">
-    <h2 id="judul-grafik">Grafik &amp; Visualisasi</h2>
-    <p class="intro">Empat grafik yang digambar langsung dari angka anggaran dan tracker di atas — diperbarui otomatis saat data berubah.</p>
-    <div class="grid grid-2">
-      <figure class="kartu chart">
-        <h3>Komposisi Pengeluaran</h3>
-        <canvas id="chart-donut" width="640" height="300" role="img" aria-label="Diagram lingkaran komposisi pengeluaran: kebutuhan 73,2 persen, tabungan dan investasi 18,1 persen, keinginan 4,9 persen, zakat 2,7 persen, belum teralokasi 1,1 persen"></canvas>
-        <figcaption id="donut-fallback">Kebutuhan Rp13.550.000 (73,2%) · Tabungan &amp; investasi Rp3.350.000 (18,1%) · Keinginan Rp900.000 (4,9%) · Zakat &amp; sedekah Rp500.000 (2,7%) · Belum teralokasi Rp200.000 (1,1%). Total Rp18.500.000.</figcaption>
-      </figure>
-      <figure class="kartu chart">
-        <h3>50/30/20 — Target vs Aktual</h3>
-        <canvas id="chart-503020" width="640" height="300" role="img" aria-label="Diagram batang target lawan aktual: kebutuhan target 9,25 juta lawan aktual 13,55 juta, keinginan 5,55 juta lawan 0,9 juta, tabungan 3,7 juta lawan 3,35 juta"></canvas>
-        <figcaption id="bar503020-fallback">Kebutuhan: target Rp9.250.000 vs aktual Rp13.550.000 (over). Keinginan: target Rp5.550.000 vs aktual Rp900.000. Tabungan: target Rp3.700.000 vs aktual Rp3.350.000.</figcaption>
-      </figure>
-      <figure class="kartu chart">
-        <h3>Proyeksi Tabungan 12 Bulan</h3>
-        <canvas id="chart-line" width="640" height="300" role="img" aria-label="Grafik garis proyeksi tabungan 12 bulan dengan setoran 2 juta per bulan dan bunga 5 persen per tahun, mencapai 24,56 juta di bulan ke-12, jauh di bawah target 120 juta"></canvas>
-        <figcaption id="line-fallback">Setoran Rp2.000.000/bulan, bunga 5%/tahun: Jan Rp2.000.000, Jun Rp12.125.697, Des Rp24.557.711. Target Rp120.000.000 tidak tercapai dalam 12 bulan — butuh 54 bulan.</figcaption>
-      </figure>
-      <figure class="kartu chart">
-        <h3>Per Kategori Kebutuhan</h3>
-        <canvas id="chart-kebutuhan" width="640" height="300" role="img" aria-label="Diagram batang horizontal kategori kebutuhan terbesar: makan 4,5 juta, KPR 3,2 juta, transportasi 1,8 juta, pendidikan 1,5 juta, belanja rumah tangga 1,2 juta, listrik 0,85 juta, kesehatan 0,5 juta"></canvas>
-        <figcaption id="bar-kebutuhan-fallback">Makan &amp; minum Rp4.500.000 · Cicilan KPR Rp3.200.000 · Transportasi Rp1.800.000 · Pendidikan Rp1.500.000 · Belanja rumah tangga Rp1.200.000 · Listrik, air, internet Rp850.000 · Kesehatan + BPJS Rp500.000.</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <!-- 6. KALKULATOR -->
-  <section class="blok" id="kalkulator" aria-labelledby="judul-kalkulator">
-    <h2 id="judul-kalkulator">Kalkulator Keuangan</h2>
-    <p class="intro">Enam kalkulator yang semuanya benar-benar menghitung. Isi angka, tekan Hitung, dan baca hasilnya beserta penjelasannya.</p>
-    <div class="grid grid-2">
-      <article class="kartu" aria-labelledby="judul-dd">
-        <h3 id="judul-dd">Dana Darurat</h3>
-        <p>Berapa lama sampai dana daruratmu cukup?</p>
-        <div class="field"><label for="dd-esensial">Pengeluaran esensial / bulan (Rp)</label><input type="number" id="dd-esensial" min="0" step="1000" value="13550000"></div>
-        <div class="field"><label for="dd-saldo">Saldo dana darurat saat ini (Rp)</label><input type="number" id="dd-saldo" min="0" step="1000" value="24000000"></div>
-        <div class="field"><label for="dd-setoran">Setoran / bulan (Rp)</label><input type="number" id="dd-setoran" min="1" step="1000" value="1000000"></div>
-        <div class="field"><label for="dd-bulan">Target cover (bulan)</label><select id="dd-bulan"><option value="3">3 bulan</option><option value="6" selected>6 bulan</option><option value="9">9 bulan</option><option value="12">12 bulan</option></select></div>
-        <p class="error" id="dd-error" aria-live="polite"></p>
-        <div class="aksi"><button type="button" id="btn-dd">Hitung Dana Darurat</button></div>
-        <div class="hasil" id="dd-hasil" hidden>
-          <output id="dd-output" aria-live="polite"></output>
-          <div class="bar-luar"><div class="bar-dalam" id="dd-bar" style="width:29%"></div></div>
-          <dl id="dd-dl"></dl>
-          <p id="dd-kalimat"></p>
-        </div>
-      </article>
-
-      <article class="kartu" aria-labelledby="judul-tt">
-        <h3 id="judul-tt">Target Tabungan (Bunga Majemuk)</h3>
-        <p>Kapan target tabungan tercapai dengan bunga majemuk?</p>
-        <div class="field"><label for="tt-target">Target tabungan (Rp)</label><input type="number" id="tt-target" min="0" step="100000" value="120000000"></div>
-        <div class="field"><label for="tt-setoran">Setoran / bulan (Rp)</label><input type="number" id="tt-setoran" min="1" step="1000" value="2000000"></div>
-        <div class="field"><label for="tt-bunga">Bunga / tahun (%)</label><input type="number" id="tt-bunga" min="0" max="30" step="0.1" value="5"></div>
-        <div class="field"><label for="tt-saldo">Saldo awal (Rp)</label><input type="number" id="tt-saldo" min="0" step="1000" value="0"></div>
-        <p class="error" id="tt-error" aria-live="polite"></p>
-        <div class="aksi"><button type="button" id="btn-tt">Hitung Target Tabungan</button></div>
-        <div class="hasil" id="tt-hasil" hidden>
-          <output id="tt-output" aria-live="polite"></output>
-          <dl id="tt-dl"></dl>
-          <div class="tabel-bungkus"><table><thead><tr><th scope="col">Akhir tahun</th><th scope="col" class="angka">Saldo</th></tr></thead><tbody id="tt-tabel"></tbody></table></div>
-        </div>
-      </article>
-
-      <article class="kartu" aria-labelledby="judul-kpr">
-        <h3 id="judul-kpr">Cicilan KPR (Anuitas)</h3>
-        <p>Berapa cicilan rumahmu per bulan, dan berapa total bunganya?</p>
-        <div class="field"><label for="kpr-pokok">Pokok pinjaman (Rp)</label><input type="number" id="kpr-pokok" min="0" step="1000000" value="300000000"></div>
-        <div class="field"><label for="kpr-bunga">Bunga / tahun (%)</label><input type="number" id="kpr-bunga" min="0" max="30" step="0.1" value="8"></div>
-        <div class="field"><label for="kpr-tenor">Tenor (bulan)</label><input type="number" id="kpr-tenor" min="1" max="360" step="1" value="180"></div>
-        <div class="field"><label for="kpr-biaya">Biaya tambahan / bulan (Rp)</label><input type="number" id="kpr-biaya" min="0" step="1000" value="333043"><span class="hint">Asuransi + admin</span></div>
-        <p class="error" id="kpr-error" aria-live="polite"></p>
-        <div class="aksi"><button type="button" id="btn-kpr">Hitung Cicilan KPR</button></div>
-        <div class="hasil" id="kpr-hasil" hidden>
-          <output id="kpr-output" aria-live="polite"></output>
-          <dl id="kpr-dl"></dl>
-          <div class="tabel-bungkus"><table><thead><tr><th scope="col">Bulan</th><th scope="col" class="angka">Bunga</th><th scope="col" class="angka">Pokok</th><th scope="col" class="angka">Sisa pokok</th></tr></thead><tbody id="kpr-tabel"></tbody></table></div>
-          <p id="kpr-peringatan"></p>
-        </div>
-      </article>
-
-      <article class="kartu" aria-labelledby="judul-zakat">
-        <h3 id="judul-zakat">Zakat Penghasilan</h3>
-        <p>Zakat profesi 2,5% bila penghasilan mencapai nisab (85 gram emas).</p>
-        <div class="field"><label for="zakat-gaji">Penghasilan / bulan (Rp)</label><input type="number" id="zakat-gaji" min="0" step="1000" value="18500000"></div>
-        <div class="field"><label for="zakat-emas">Harga emas / gram (Rp)</label><input type="number" id="zakat-emas" min="1" step="1000" value="1500000"></div>
-        <div class="field"><label for="zakat-utang">Utang jatuh tempo / bulan (Rp)</label><input type="number" id="zakat-utang" min="0" step="1000" value="0"></div>
-        <p class="error" id="zakat-error" aria-live="polite"></p>
-        <div class="aksi"><button type="button" id="btn-zakat">Hitung Zakat</button></div>
-        <div class="hasil" id="zakat-hasil" hidden>
-          <output id="zakat-output" aria-live="polite"></output>
-          <dl id="zakat-dl"></dl>
-          <p id="zakat-kalimat"></p>
-        </div>
-      </article>
-
-      <article class="kartu" aria-labelledby="judul-inflasi">
-        <h3 id="judul-inflasi">Inflasi &amp; Daya Beli</h3>
-        <p>Berapa harga barang yang sama di masa depan — dan berapa nilai uangmu saat itu?</p>
-        <div class="field"><label for="inf-nominal">Nominal sekarang (Rp)</label><input type="number" id="inf-nominal" min="0" step="100000" value="10000000"></div>
-        <div class="field"><label for="inf-inflasi">Inflasi / tahun (%)</label><input type="number" id="inf-inflasi" min="-10" max="30" step="0.1" value="4"></div>
-        <div class="field"><label for="inf-tahun">Jangka waktu (tahun): <span id="inf-tahun-nilai">5</span></label><input type="range" id="inf-tahun" min="1" max="20" step="1" value="5"></div>
-        <p class="error" id="inf-error" aria-live="polite"></p>
-        <div class="aksi"><button type="button" id="btn-inf">Hitung Inflasi</button></div>
-        <div class="hasil" id="inf-hasil" hidden>
-          <output id="inf-output" aria-live="polite"></output>
-          <dl id="inf-dl"></dl>
-          <div class="tabel-bungkus"><table><thead><tr><th scope="col">Tahun</th><th scope="col" class="angka">Biaya masa depan</th></tr></thead><tbody id="inf-tabel"></tbody></table></div>
-        </div>
-      </article>
-
-      <article class="kartu" aria-labelledby="judul-utang">
-        <h3 id="judul-utang">Pelunasan Utang</h3>
-        <p>Berapa bulan sampai utang lunas dengan cicilan tetap?</p>
-        <div class="field"><label for="utang-saldo">Saldo utang (Rp)</label><input type="number" id="utang-saldo" min="0" step="100000" value="10000000"></div>
-        <div class="field"><label for="utang-bunga">Bunga / tahun (%)</label><input type="number" id="utang-bunga" min="0" max="60" step="0.1" value="12"></div>
-        <div class="field"><label for="utang-cicilan">Cicilan / bulan (Rp)</label><input type="number" id="utang-cicilan" min="1" step="10000" value="1000000"></div>
-        <p class="error" id="utang-error" aria-live="polite"></p>
-        <div class="aksi"><button type="button" id="btn-utang">Hitung Pelunasan</button></div>
-        <div class="hasil" id="utang-hasil" hidden>
-          <output id="utang-output" aria-live="polite"></output>
-          <dl id="utang-dl"></dl>
-          <p id="utang-kalimat"></p>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- 7. LAPORAN -->
-  <section class="blok" id="laporan" aria-labelledby="judul-laporan">
-    <h2 id="judul-laporan">Laporan Bulanan</h2>
-    <p class="intro">Ringkasan November 2026: anggaran lawan realisasi dari tracker, lengkap dengan skor kesehatan. Unduh sebagai CSV atau cetak.</p>
-    <div class="kartu">
-      <div class="tabel-bungkus">
-        <table>
-          <caption class="visually-hidden">Laporan bulanan anggaran lawan aktual</caption>
-          <thead><tr><th scope="col">Kategori</th><th scope="col" class="angka">Anggaran</th><th scope="col" class="angka">Aktual</th><th scope="col" class="angka">Selisih</th></tr></thead>
-          <tbody id="laporan-tbody"></tbody>
-          <tfoot>
-            <tr class="total"><td>Total pemasukan</td><td class="angka" id="lap-masuk-anggaran">Rp18.500.000</td><td class="angka" id="lap-masuk-aktual">Rp18.500.000</td><td class="angka" id="lap-masuk-selisih">Rp0</td></tr>
-            <tr class="total"><td>Total pengeluaran</td><td class="angka" id="lap-keluar-anggaran">Rp18.500.000</td><td class="angka" id="lap-keluar-aktual">Rp18.500.000</td><td class="angka" id="lap-keluar-selisih">Rp0</td></tr>
-            <tr class="total"><td>Sisa</td><td class="angka">Rp0</td><td class="angka" id="lap-sisa">Rp0</td><td class="angka" id="lap-sisa-selisih">Rp0</td></tr>
-          </tfoot>
-        </table>
+<!-- ================= 05 GRAFIK ================= -->
+<section id="grafik" aria-labelledby="h-grafik">
+  <div class="wrap">
+    <p class="eyebrow">05 · Grafik</p>
+    <h2 id="h-grafik">Grafik Anggaran</h2>
+    <p class="lede">Empat gambar yang bercerita — semua digambar dari angka yang sama dengan kalkulator di bawah.</p>
+    <div class="preview-grid">
+      <div class="card chart-card">
+        <h3>Ke mana perginya Rp18.500.000?</h3>
+        <canvas id="chart-donut" role="img" aria-label="Donut komposisi outflow November 2026"></canvas>
+        <p class="chart-fallback">Kebutuhan Rp13.550.000 (73,2%) · Tabungan Rp3.350.000 (18,1%) · Keinginan Rp900.000 (4,9%) · Zakat Rp500.000 (2,7%) · Belum teralokasi Rp200.000 (1,1%). Total Rp18.500.000. Sumber: 20 transaksi November 2026.</p>
       </div>
-      <p>Skor kesehatan anggaran bulan ini: <strong id="lap-skor" aria-live="polite">70 (Cukup)</strong>. Tanggal laporan: <span id="lap-tanggal">30 November 2026</span>.</p>
-      <div class="aksi">
-        <button type="button" id="btn-csv">Export CSV</button>
-        <button type="button" id="btn-cetak" class="sekunder">Cetak Laporan</button>
+      <div class="card chart-card">
+        <h3>Kebutuhan over Rp4,3jt · keinginan hemat Rp4,65jt · tabungan kurang Rp0,35jt</h3>
+        <canvas id="chart-target" role="img" aria-label="Bar target vs aktual 50/30/20"></canvas>
+        <p class="chart-fallback">Target: Kebutuhan Rp9.250.000, Keinginan Rp5.550.000, Tabungan Rp3.700.000. Aktual: Rp13.550.000, Rp900.000, Rp3.350.000. Sumber: anggaran November 2026.</p>
       </div>
-      <p class="netral" id="csv-status" aria-live="polite"></p>
+      <div class="card chart-card">
+        <h3>Rp2jt/bln + bunga 5% → Rp24.557.711 dalam 12 bulan</h3>
+        <canvas id="chart-line" role="img" aria-label="Line proyeksi tabungan pendidikan 12 bulan"></canvas>
+        <p class="chart-fallback">Proyeksi tabungan pendidikan, setoran Rp2.000.000/bulan, bunga 5% per tahun: Jan Rp2.000.000, Jun Rp12.125.697, Des Rp24.557.711. Target Rp120.000.000 belum tercapai dalam 12 bulan — perlu 54 bulan. Sumber: kalkulator target tabungan.</p>
+      </div>
+      <div class="card chart-card">
+        <h3>5 pos terbesar menyerap 90% belanja kebutuhan</h3>
+        <canvas id="chart-cats" role="img" aria-label="Bar horizontal per kategori kebutuhan"></canvas>
+        <p class="chart-fallback">Makan Rp4.500.000 · KPR Rp3.200.000 · Transportasi Rp1.800.000 · Pendidikan Rp1.500.000 · Belanja RT Rp1.200.000 · Listrik, air, internet Rp850.000 · Kesehatan Rp500.000. Lima teratas Rp12.200.000 dari Rp13.550.000 (90,0%). Sumber: anggaran November 2026.</p>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- 8. TIPS -->
-  <section class="blok" id="tips" aria-labelledby="judul-tips">
-    <h2 id="judul-tips">Tips &amp; Checklist Hemat</h2>
-    <p class="intro">Delapan kebiasaan hemat yang cocok dengan anggaran keluarga ini — plus checklist harian yang tersimpan di browser.</p>
-    <div class="grid" id="tips-grid"></div>
-    <article class="kartu">
-      <h3>Checklist Hemat Hari Ini</h3>
-      <p id="checklist-progress" aria-live="polite">0 dari 8 selesai</p>
-      <ul class="checklist" id="checklist"></ul>
-    </article>
-  </section>
+<!-- ================= 06 KALKULATOR ================= -->
+<section id="kalkulator" aria-labelledby="h-kalkulator">
+  <div class="wrap">
+    <p class="eyebrow">06 · Kalkulator</p>
+    <h2 id="h-kalkulator">Kalkulator Keuangan Keluarga</h2>
+    <p class="lede">Sepuluh alat — tujuh di bawah ini, plus 50/30/20 di Anggaran, Tracker di Transaksi, dan Dashboard otomatis. Hasil muncul langsung saat Anda mengetik.</p>
+    <nav class="calc-nav" aria-label="Daftar kalkulator">
+      <a href="#kalk-5320">1 · 50/30/20</a>
+      <a href="#tracker">2 · Tracker</a>
+      <a href="#kalk-darurat">3 · Dana Darurat</a>
+      <a href="#kalk-tabungan">4 · Target Tabungan</a>
+      <a href="#kalk-kpr">5 · Cicilan KPR</a>
+      <a href="#kalk-zakat">6 · Zakat Penghasilan</a>
+      <a href="#kalk-inflasi">7 · Inflasi / Daya Beli</a>
+      <a href="#kalk-utang">8 · Pelunasan Utang</a>
+      <a href="#dashboard">9 · Dashboard</a>
+      <a href="#laporan">10 · Export &amp; Cetak</a>
+    </nav>
+    <div class="calc-grid">
+      <div class="card calc-card" id="kalk-kpr">
+        <p class="eyebrow">Kalkulator 5 · Cicilan KPR</p>
+        <h3>Berapa cicilan rumah per bulan?</h3>
+        <form onsubmit="return false">
+          <label class="field"><span>Pokok pinjaman (Rp)</span><input type="number" id="in-pokok" min="1" step="1000000" value="300000000"></label>
+          <label class="field"><span>Bunga per tahun (%)</span><input type="number" id="in-bunga-kpr" min="0" step="0.1" value="8"></label>
+          <label class="field"><span>Tenor (bulan)</span><input type="number" id="in-tenor" min="1" step="1" value="180"></label>
+          <label class="field"><span>Biaya tambahan per bulan — asuransi + admin (Rp)</span><input type="number" id="in-biaya-kpr" min="0" step="1" value="333043"></label>
+          <p class="error" id="err-kpr" aria-live="polite"></p>
+        </form>
+        <div class="calc-out" id="out-kpr" aria-live="polite"></div>
+        <table class="mini-table"><thead><tr><th>Bulan</th><th>Bunga</th><th>Pokok</th><th>Sisa pokok</th></tr></thead><tbody id="tbody-kpr"></tbody></table>
+      </div>
+      <div class="card calc-card" id="kalk-inflasi">
+        <p class="eyebrow">Kalkulator 7 · Inflasi / Daya Beli</p>
+        <h3>Berapa nilai uang Anda nanti?</h3>
+        <form onsubmit="return false">
+          <label class="field"><span>Nominal sekarang (Rp)</span><input type="number" id="in-nominal" min="1" step="100000" value="10000000"></label>
+          <label class="field"><span>Inflasi per tahun (%) — boleh negatif (deflasi)</span><input type="number" id="in-inflasi" step="0.1" value="4"></label>
+          <label class="field"><span>Jangka: <output id="tahun-label">5 tahun</output></span><input type="range" id="in-tahun" min="1" max="20" step="1" value="5"></label>
+          <p class="error" id="err-inflasi" aria-live="polite"></p>
+        </form>
+        <div class="calc-out" id="out-inflasi" aria-live="polite"></div>
+        <table class="mini-table"><thead><tr><th>Tahun</th><th>Biaya masa depan</th><th>Nilai riil</th></tr></thead><tbody id="tbody-inflasi"></tbody></table>
+      </div>
+      <div class="card calc-card" id="kalk-darurat">
+        <p class="eyebrow">Kalkulator 3 · Dana Darurat</p>
+        <h3>Kapan dana darurat penuh?</h3>
+        <form onsubmit="return false">
+          <label class="field"><span>Belanja esensial per bulan (Rp)</span><input type="number" id="in-esensial" min="1" step="1000" value="13550000"></label>
+          <label class="field"><span>Saldo dana darurat sekarang (Rp)</span><input type="number" id="in-saldo-darurat" min="0" step="1000" value="24000000"></label>
+          <label class="field"><span>Setoran per bulan (Rp)</span><input type="number" id="in-setoran-darurat" min="1" step="1000" value="1000000"></label>
+          <label class="field"><span>Bulan cover target</span>
+            <select id="in-cover"><option value="3">3 bulan</option><option value="6" selected>6 bulan</option><option value="9">9 bulan</option><option value="12">12 bulan</option></select>
+          </label>
+          <p class="error" id="err-darurat" aria-live="polite"></p>
+        </form>
+        <div class="calc-out" id="out-darurat" aria-live="polite"></div>
+      </div>
+      <div class="card calc-card" id="kalk-tabungan">
+        <p class="eyebrow">Kalkulator 4 · Target Tabungan</p>
+        <h3>Menabung untuk pendidikan anak</h3>
+        <form onsubmit="return false">
+          <label class="field"><span>Target tabungan (Rp)</span><input type="number" id="in-target-tab" min="1" step="1000000" value="120000000"></label>
+          <label class="field"><span>Setoran per bulan (Rp)</span><input type="number" id="in-setoran-tab" min="1" step="1000" value="2000000"></label>
+          <label class="field"><span>Bunga per tahun (%)</span><input type="number" id="in-bunga-tab" min="0" step="0.1" value="5"></label>
+          <label class="field"><span>Saldo awal (Rp)</span><input type="number" id="in-awal-tab" min="0" step="1000" value="0"></label>
+          <p class="error" id="err-tabungan" aria-live="polite"></p>
+        </form>
+        <div class="calc-out" id="out-tabungan" aria-live="polite"></div>
+        <table class="mini-table"><thead><tr><th>Tahun</th><th>Saldo akhir tahun</th></tr></thead><tbody id="tbody-tabungan"></tbody></table>
+      </div>
+      <div class="card calc-card" id="kalk-zakat">
+        <p class="eyebrow">Kalkulator 6 · Zakat Penghasilan</p>
+        <h3>Apakah sudah wajib zakat?</h3>
+        <form onsubmit="return false">
+          <label class="field"><span>Gaji per bulan (Rp)</span><input type="number" id="in-gaji-zakat" min="1" step="1000" value="18500000"></label>
+          <label class="field"><span>Harga emas per gram (Rp)</span><input type="number" id="in-emas" min="1" step="1000" value="1500000"></label>
+          <label class="field"><span>Utang jatuh tempo per bulan (Rp)</span><input type="number" id="in-utang-zakat" min="0" step="1000" value="0"></label>
+          <p class="error" id="err-zakat" aria-live="polite"></p>
+        </form>
+        <div class="calc-out" id="out-zakat" aria-live="polite"></div>
+        <p class="caption">Nisab = 85 gram emas. Zakat 2,5% hanya wajib bila penghasilan di atas nisab bulanan.</p>
+      </div>
+      <div class="card calc-card" id="kalk-utang">
+        <p class="eyebrow">Kalkulator 8 · Pelunasan Utang</p>
+        <h3>Kapan utang lunas?</h3>
+        <form onsubmit="return false">
+          <label class="field"><span>Saldo utang (Rp)</span><input type="number" id="in-saldo-utang" min="1" step="1000" value="10000000"></label>
+          <label class="field"><span>Bunga per tahun (%)</span><input type="number" id="in-bunga-utang" min="0" step="0.1" value="12"></label>
+          <label class="field"><span>Cicilan per bulan (Rp)</span><input type="number" id="in-cicilan-utang" min="1" step="1000" value="1000000"></label>
+          <p class="error" id="err-utang" aria-live="polite"></p>
+        </form>
+        <div class="calc-out" id="out-utang" aria-live="polite"></div>
+        <table class="mini-table"><thead><tr><th>Bulan</th><th>Bunga</th><th>Cicilan</th><th>Sisa utang</th></tr></thead><tbody id="tbody-utang"></tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 LAPORAN ================= -->
+<section id="laporan" aria-labelledby="h-laporan">
+  <div class="wrap">
+    <p class="eyebrow">07 · Laporan</p>
+    <h2 id="h-laporan">Laporan Bulanan — November 2026</h2>
+    <p class="lede">Ringkasan bulan ini, siap diunduh sebagai CSV atau dicetak.</p>
+    <div class="card" style="max-width:640px">
+      <p class="summary-line">Pemasukan: <b id="rep-in">Rp18.500.000</b></p>
+      <p class="summary-line">Total keluar: <b id="rep-out">Rp18.500.000</b></p>
+      <p class="summary-line">Sisa: <b id="rep-sisa">Rp0</b></p>
+      <p class="summary-line"><span id="rep-save-pct">18,1% dari pemasukan ditabung</span> · <span id="rep-score">Skor kesehatan 70 (Cukup)</span></p>
+      <p style="margin-top:16px">
+        <button class="btn" type="button" id="btn-csv">Unduh CSV</button>
+        <button class="btn secondary" type="button" id="btn-print">Cetak Laporan</button>
+      </p>
+      <p class="status" id="csv-status" aria-live="polite"></p>
+      <p class="caption">CSV berisi 25 baris: judul laporan, header, 20 transaksi, dan 3 baris total (pemasukan, pengeluaran, sisa). File dibuat di browser — tidak ada yang dikirim ke server.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 08 TIPS ================= -->
+<section id="tips" aria-labelledby="h-tips">
+  <div class="wrap">
+    <p class="eyebrow">08 · Tips</p>
+    <h2 id="h-tips">Tips Hemat Keluarga</h2>
+    <p class="lede">Delapan kebiasaan kecil yang menjaga anggaran tetap pas. Centang yang sudah dilakukan — tersimpan otomatis.</p>
+    <p class="summary-line" id="tips-count" aria-live="polite">0 dari 8 tips sudah dicentang</p>
+    <ul class="tips-list" id="tips-list"></ul>
+  </div>
+</section>
 </main>
 
-<footer class="situs">
-  <div class="lebar">
-    <p><strong>Anggaran Rumah Tangga Kita</strong> — semua data tersimpan lokal di browser Anda, tidak dikirim ke server mana pun. Tidak ada pelacakan, tidak ada iklan.</p>
-    <p>Sumber rumus: aturan 50/30/20 (Elizabeth Warren); anuitas KPR: angsuran = P × r × (1+r)ⁿ ÷ ((1+r)ⁿ − 1); bunga majemuk bulanan; zakat penghasilan 2,5% dengan nisab 85 gram emas (BAZNAS); inflasi: biaya masa depan = PV × (1+i)ᵗ.</p>
-    <p>Angka contoh: keluarga 2 anak di Jakarta, November 2026. Harga emas Rp1.500.000/gram dan bunga KPR 8%/tahun adalah asumsi contoh — sesuaikan dengan kondisi Anda.</p>
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Anggaran Rumah Tangga Kita — buku kas keluarga. Data keluarga fiktif untuk contoh.</p>
+    <p>Semua Rupiah diformat id-ID · disimpan di localStorage ahrt-setup, ahrt-transactions, ahrt-checklist · tidak ada permintaan jaringan.</p>
+    <p>Dibuat November 2026 · Jakarta</p>
   </div>
 </footer>
 
-<script type="module" src="app.js"></script>
+<script src="data.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
