@@ -1,179 +1,252 @@
-// Empat chart canvas 2D murni — tanpa library, tanpa CDN.
-// Semua fungsi menerima data sebagai argumen; tidak ada variabel global yang dibayangi di sini.
+/* Anggaran Rumah Tangga Kita — 4 chart canvas 2D murni, tanpa library.
+   Palet di-hardcode di sini dan HARUS cocok dengan :root di style.css. */
+'use strict';
 
-export function fmtJt(nilai) {
-  if (nilai >= 1000000) return 'Rp' + (nilai / 1000000).toFixed(nilai % 1000000 === 0 ? 0 : 1).replace('.', ',') + ' jt';
-  if (nilai >= 1000) return 'Rp' + Math.round(nilai / 1000) + ' rb';
-  return 'Rp' + nilai;
-}
+const PALETTE = {
+  ink: '#1A1A1A', ink2: '#4A4540', paper: '#FBF6E9', surface: '#FFFCF2',
+  line: '#E4DCC6', lineStrong: '#D6CCB4', forest: '#1F4E3D', forestDeep: '#143528',
+  forestMid: '#4A8172', terra: '#B85C3C', gold: '#C9A227', success: '#2D7A4F',
+  warning: '#B8761C', danger: '#A8311F', muted: '#A8A79E',
+};
+const MONO = "12px ui-monospace, 'SF Mono', Consolas, 'Courier New', monospace";
+const MONO_SM = "11px ui-monospace, 'SF Mono', Consolas, 'Courier New', monospace";
+const SANS = "13px ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
 
-function siapkanCanvas(canvas) {
+/* Siapkan canvas DPR-aware; kembalikan ctx + ukuran CSS.
+   Tinggi canvas diatur per chart agar label luar donut tidak terpotong. */
+function prepCanvas(canvas, heightCss) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth || canvas.parentElement.clientWidth || 560;
+  const h = heightCss;
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  canvas.style.height = h + 'px';
   const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
-  // Ukuran backing store mengikuti lebar tampil kartu (x2 untuk ketajaman),
-  // supaya koordinat gambar 1:1 dengan piksel CSS dan teks tidak mengecil.
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const cssW = canvas.clientWidth || 640;
-  const cssH = 300;
-  canvas.width = Math.round(cssW * dpr);
-  canvas.height = Math.round(cssH * dpr);
-  canvas.style.height = cssH + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, cssW, cssH);
-  ctx.font = '13px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  return { ctx, lebar: cssW, tinggi: cssH };
+  ctx.clearRect(0, 0, w, h);
+  return { ctx, w, h };
 }
 
-// 1. Donut komposisi outflow.
-export function drawDonut(canvas, kelompok) {
-  const s = siapkanCanvas(canvas);
-  if (!s) return false;
-  const { ctx, lebar, tinggi } = s;
-  const total = kelompok.reduce((a, k) => a + k.total, 0);
-  const cx = lebar * 0.28;
-  const cy = tinggi / 2;
-  const r = Math.min(lebar * 0.22, tinggi / 2 - 14);
-  let sudut = -Math.PI / 2;
-  for (const k of kelompok) {
-    const porsi = (k.total / total) * Math.PI * 2;
+/* 1. Donut komposisi outflow: 5 slice + label luar + total di tengah.
+   Label luar di-stagger vertikal per sisi supaya slice kecil yang
+   berdekatan tidak bertabrakan; nama dipendekkan, nilai lengkap ada di
+   teks fallback di bawah canvas. */
+function drawDonut(canvas, slices, totalLabel) {
+  const { ctx, w, h } = prepCanvas(canvas, 340);
+  const cx = w / 2, cy = h / 2 + 6, rOut = 92, rIn = 60;
+  const total = slices.reduce((s, x) => s + x.value, 0);
+  let a = -Math.PI / 2;
+  const mids = [];
+  slices.forEach((s) => {
+    const span = (s.value / total) * Math.PI * 2;
     ctx.beginPath();
     ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, sudut, sudut + porsi);
+    ctx.arc(cx, cy, rOut, a, a + span);
     ctx.closePath();
-    ctx.fillStyle = k.warna;
+    ctx.fillStyle = s.color;
     ctx.fill();
-    sudut += porsi;
-  }
+    mids.push(a + span / 2);
+    a += span;
+  });
+  /* Lubang tengah */
   ctx.beginPath();
-  ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2);
-  ctx.fillStyle = '#ffffff';
+  ctx.arc(cx, cy, rIn, 0, Math.PI * 2);
+  ctx.fillStyle = PALETTE.surface;
   ctx.fill();
-  ctx.fillStyle = '#1e293b';
+  ctx.fillStyle = PALETTE.ink;
+  ctx.font = "600 15px ui-monospace, Consolas, monospace";
   ctx.textAlign = 'center';
-  ctx.font = 'bold 16px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  ctx.fillText('Rp 18,5 jt', cx, cy - 2);
-  ctx.font = '12px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  ctx.fillStyle = '#475569';
-  ctx.fillText('total / bulan', cx, cy + 16);
-  // Legenda di kanan (nama singkat + %; angka lengkap ada di figcaption).
-  ctx.textAlign = 'left';
-  ctx.font = '13px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  let y = 34;
-  const namaSingkat = {
-    'Kebutuhan': 'Kebutuhan', 'Keinginan': 'Keinginan', 'Zakat & sedekah': 'Zakat',
-    'Tabungan & investasi': 'Tabungan', 'Belum teralokasi': 'Fleksibel',
-  };
-  for (const k of kelompok) {
-    ctx.fillStyle = k.warna;
-    ctx.fillRect(lebar * 0.56, y - 10, 12, 12);
-    ctx.fillStyle = '#1e293b';
-    ctx.fillText((namaSingkat[k.kelompok] || k.kelompok) + ' ' + ((k.total / total) * 100).toFixed(1).replace('.', ',') + '%', lebar * 0.56 + 18, y);
-    y += 30;
-  }
-  return true;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(totalLabel, cx, cy - 9);
+  ctx.fillStyle = PALETTE.ink2;
+  ctx.font = MONO_SM;
+  ctx.fillText('100% dari gaji', cx, cy + 11);
+  /* Label luar: kumpulkan dulu, stagger vertikal per sisi, baru digambar. */
+  const items = slices.map((s, i) => {
+    const mid = mids[i];
+    const left = Math.cos(mid) < 0;
+    const ex = cx + Math.cos(mid) * (rOut + 4);
+    const ey = cy + Math.sin(mid) * (rOut + 4);
+    const ax = cx + Math.cos(mid) * (rOut + 22);
+    const ay = cy + Math.sin(mid) * (rOut + 22);
+    return { s, left, ex, ey, ax, ay, lx: ax + (left ? -22 : 22), ly: ay };
+  });
+  [true, false].forEach((side) => {
+    const group = items.filter((it) => it.left === side).sort((p, q) => p.ly - q.ly);
+    for (let i = 1; i < group.length; i++) {
+      if (group[i].ly < group[i - 1].ly + 32) group[i].ly = group[i - 1].ly + 32;
+    }
+  });
+  ctx.font = MONO_SM;
+  items.forEach((it) => {
+    /* Siku memakai ly hasil stagger, bukan ay asli: ruas horizontal tepat
+       setinggi label, jadi garis tidak menyerong menembus label tetangga. */
+    ctx.strokeStyle = PALETTE.lineStrong;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(it.ex, it.ey);
+    ctx.lineTo(it.ax, it.ly);
+    ctx.lineTo(it.lx, it.ly);
+    ctx.stroke();
+    ctx.textAlign = it.left ? 'right' : 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = PALETTE.ink;
+    ctx.fillText(it.s.label, it.lx, it.ly - 7);
+    ctx.fillStyle = PALETTE.ink2;
+    ctx.fillText(it.s.valueLabel + ' · ' + it.s.pct, it.lx, it.ly + 7);
+  });
 }
 
-// 2. Bar grouped 50/30/20 target vs aktual.
-export function drawBar503020(canvas, pilar) {
-  const s = siapkanCanvas(canvas);
-  if (!s) return false;
-  const { ctx, lebar, tinggi } = s;
-  const maks = Math.max(...pilar.flatMap(p => [p.target, p.aktual])) * 1.18;
-  const dasar = tinggi - 34;
-  const area = dasar - 34;
-  const grupLebar = lebar / 3;
-  const barLebar = 36;
-  ctx.textAlign = 'center';
-  ctx.font = '12px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  pilar.forEach((p, i) => {
-    const x0 = i * grupLebar + grupLebar / 2;
-    const tTinggi = (p.target / maks) * area;
-    const aTinggi = (p.aktual / maks) * area;
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillRect(x0 - barLebar - 4, dasar - tTinggi, barLebar, tTinggi);
-    ctx.fillStyle = p.aktual > p.target ? '#dc2626' : '#16a34a';
-    ctx.fillRect(x0 + 4, dasar - aTinggi, barLebar, aTinggi);
-    ctx.fillStyle = '#1e293b';
-    ctx.fillText(fmtJt(p.target), x0 - barLebar / 2 - 4, dasar - tTinggi - 6);
-    ctx.fillText(fmtJt(p.aktual), x0 + barLebar / 2 + 4, dasar - aTinggi - 6);
-    ctx.fillStyle = '#475569';
-    ctx.fillText(p.nama, x0, dasar + 16);
-  });
-  ctx.strokeStyle = '#cbd5e1';
-  ctx.beginPath(); ctx.moveTo(8, dasar); ctx.lineTo(lebar - 8, dasar); ctx.stroke();
-  // Keterangan warna ada di figcaption di bawah grafik.
-  return true;
-}
-
-// 3. Line proyeksi tabungan 12 bulan + garis target putus-putus.
-export function drawLine(canvas, nilai, labelBulan, target) {
-  const s = siapkanCanvas(canvas);
-  if (!s) return false;
-  const { ctx, lebar, tinggi } = s;
-  const kiri = 66, kanan = 16, atas = 30, bawah = 32;
-  const w = lebar - kiri - kanan;
-  const h = tinggi - atas - bawah;
-  const maks = target;
-  const x = i => kiri + (i / (nilai.length - 1)) * w;
-  const y = v => atas + h - (v / maks) * h;
-  // Grid + label sumbu Y.
-  ctx.strokeStyle = '#e2e8f0';
-  ctx.fillStyle = '#475569';
-  ctx.font = '12px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  ctx.textAlign = 'right';
-  [0, 40000000, 80000000, 120000000].forEach(v => {
-    ctx.beginPath(); ctx.moveTo(kiri, y(v)); ctx.lineTo(lebar - kanan, y(v)); ctx.stroke();
-    ctx.fillText(fmtJt(v), kiri - 6, y(v) + 4);
-  });
-  // Garis target putus-putus + label di ujung kanan (tidak menabrak label sumbu).
-  ctx.strokeStyle = '#dc2626';
-  ctx.setLineDash([6, 5]);
-  ctx.beginPath(); ctx.moveTo(kiri, y(target)); ctx.lineTo(lebar - kanan, y(target)); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#dc2626';
-  ctx.textAlign = 'right';
-  ctx.font = '13px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  ctx.fillText('Target Rp120 jt', lebar - kanan, y(target) + 16);
-  // Garis proyeksi.
-  ctx.strokeStyle = '#16a34a';
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  nilai.forEach((v, i) => { if (i === 0) ctx.moveTo(x(i), y(v)); else ctx.lineTo(x(i), y(v)); });
-  ctx.stroke();
+/* 2. Bar target vs aktual 50/30/20 (grouped), label nilai di atas batang. */
+function drawTargetActual(canvas, groups) {
+  const { ctx, w, h } = prepCanvas(canvas, 340);
+  const padL = 8, padR = 8, padT = 30, padB = 34;
+  const maxV = Math.max.apply(null, groups.map((g) => Math.max(g.target, g.actual))) * 1.18;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  const groupW = plotW / groups.length;
+  const barW = Math.min(44, groupW / 3.4);
+  ctx.strokeStyle = PALETTE.lineStrong;
   ctx.lineWidth = 1;
-  ctx.fillStyle = '#16a34a';
-  nilai.forEach((v, i) => { ctx.beginPath(); ctx.arc(x(i), y(v), 3, 0, Math.PI * 2); ctx.fill(); });
-  // Label bulan (semua 12) + nilai akhir di atas titik terakhir.
-  ctx.fillStyle = '#475569';
-  ctx.font = '12px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  ctx.textAlign = 'center';
-  labelBulan.forEach((b, i) => { ctx.fillText(b, x(i), tinggi - 10); });
-  ctx.fillStyle = '#1e293b';
-  ctx.font = '13px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  ctx.textAlign = 'right';
-  ctx.fillText('Des: Rp24.557.711', lebar - kanan, y(nilai[nilai.length - 1]) - 10);
-  return true;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT + plotH);
+  ctx.lineTo(w - padR, padT + plotH);
+  ctx.stroke();
+  groups.forEach((g, gi) => {
+    const gx = padL + gi * groupW + groupW / 2;
+    const pairs = [
+      { v: g.target, color: '#CFC7B0', label: 'target' },
+      { v: g.actual, color: g.actual > g.target ? PALETTE.danger : PALETTE.success, label: 'aktual' },
+    ];
+    pairs.forEach((p, pi) => {
+      const bh = (p.v / maxV) * plotH;
+      const bx = gx + (pi === 0 ? -barW - 4 : 4);
+      const by = padT + plotH - bh;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(bx, by, barW, bh);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.font = MONO_SM;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(g.fmt(p.v), bx + barW / 2, by - 4);
+    });
+    ctx.fillStyle = PALETTE.ink;
+    ctx.font = SANS;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(g.label, gx, padT + plotH + 8);
+    ctx.fillStyle = g.actual > g.target ? PALETTE.danger : PALETTE.success;
+    ctx.font = MONO_SM;
+    ctx.fillText(g.deltaLabel, gx, padT + plotH + 24);
+  });
+  /* Legenda kecil */
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.font = MONO_SM;
+  ctx.fillStyle = '#CFC7B0';
+  ctx.fillRect(padL, 8, 12, 12);
+  ctx.fillStyle = PALETTE.ink2;
+  ctx.fillText('target', padL + 17, 14);
+  ctx.fillStyle = PALETTE.success;
+  ctx.fillRect(padL + 72, 8, 12, 12);
+  ctx.fillStyle = PALETTE.ink2;
+  ctx.fillText('aktual (≤ target = hijau, over = merah)', padL + 89, 14);
 }
 
-// 4. Bar horizontal per kategori kebutuhan, urut menurun.
-export function drawNeedsBar(canvas, item) {
-  const s = siapkanCanvas(canvas);
-  if (!s) return false;
-  const { ctx, lebar, tinggi } = s;
-  const terurut = [...item].sort((a, b) => b.nominal - a.nominal);
-  const maks = terurut[0].nominal * 1.22;
-  const barTinggi = 22;
-  const gap = (tinggi - 20 - terurut.length * barTinggi) / (terurut.length + 1);
-  ctx.textAlign = 'left';
-  terurut.forEach((it, i) => {
-    const y = 16 + gap + i * (barTinggi + gap);
-    const barLebar = (it.nominal / maks) * (lebar - 210);
-    ctx.fillStyle = '#475569';
-    ctx.fillText(it.nama, 8, y + 15);
-    ctx.fillStyle = it.nama.includes('KPR') ? '#dc2626' : '#16a34a';
-    ctx.fillRect(150, y, barLebar, barTinggi);
-    ctx.fillStyle = '#1e293b';
-    ctx.fillText(fmtJt(it.nominal), 150 + barLebar + 8, y + 15);
+/* 3. Line proyeksi tabungan 12 bulan + garis target putus-putus. */
+function drawProjectionLine(canvas, months, values, targetValue, endLabel) {
+  const { ctx, w, h } = prepCanvas(canvas, 320);
+  const padL = 64, padR = 16, padT = 26, padB = 30;
+  const maxV = Math.max(targetValue, values[values.length - 1]) * 1.08;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  const x = (i) => padL + (i / (months.length - 1)) * plotW;
+  const y = (v) => padT + plotH - (v / maxV) * plotH;
+  /* Grid + label sumbu Y */
+  ctx.font = MONO_SM;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  [0, 0.25, 0.5, 0.75, 1].forEach((f) => {
+    const gy = padT + plotH - f * plotH;
+    ctx.strokeStyle = PALETTE.line;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL, gy);
+    ctx.lineTo(w - padR, gy);
+    ctx.stroke();
+    ctx.fillStyle = PALETTE.ink2;
+    ctx.fillText('Rp' + (maxV * f / 1000000).toFixed(0).replace('.', ',') + ' jt', padL - 8, gy);
   });
-  return true;
+  /* Garis target putus-putus */
+  ctx.strokeStyle = PALETTE.terra;
+  ctx.setLineDash([6, 5]);
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(padL, y(targetValue));
+  ctx.lineTo(w - padR, y(targetValue));
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = PALETTE.terra;
+  ctx.textAlign = 'left';
+  ctx.fillText('target Rp120 jt', padL + 6, y(targetValue) - 9);
+  /* Area fill + garis proyeksi */
+  const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+  grad.addColorStop(0, 'rgba(31,78,61,0.16)');
+  grad.addColorStop(1, 'rgba(31,78,61,0.01)');
+  ctx.beginPath();
+  ctx.moveTo(x(0), y(values[0]));
+  values.forEach((v, i) => ctx.lineTo(x(i), y(v)));
+  ctx.lineTo(x(values.length - 1), padT + plotH);
+  ctx.lineTo(x(0), padT + plotH);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.beginPath();
+  values.forEach((v, i) => (i === 0 ? ctx.moveTo(x(i), y(v)) : ctx.lineTo(x(i), y(v))));
+  ctx.strokeStyle = PALETTE.forest;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  values.forEach((v, i) => {
+    ctx.beginPath();
+    ctx.arc(x(i), y(v), 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = PALETTE.forest;
+    ctx.fill();
+  });
+  /* Label sumbu X + label akhir */
+  ctx.font = MONO_SM;
+  ctx.fillStyle = PALETTE.ink2;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  months.forEach((m, i) => {
+    if (i % 2 === 0 || i === months.length - 1) ctx.fillText(m, x(i), padT + plotH + 8);
+  });
+  ctx.fillStyle = PALETTE.forest;
+  ctx.font = "600 11px ui-monospace, Consolas, monospace";
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(endLabel, x(values.length - 1) - 4, y(values[values.length - 1]) - 8);
 }
+
+/* 4. Bar horizontal per kategori kebutuhan, urut menurun. */
+function drawCategoryBars(canvas, rows) {
+  const rowH = 34, padT = 8, padB = 8;
+  const { ctx, w, h } = prepCanvas(canvas, padT + padB + rows.length * rowH);
+  const labelW = 168, valueW = 92;
+  const maxV = Math.max.apply(null, rows.map((r) => r.value));
+  const plotX = labelW, plotW = w - labelW - valueW;
+  rows.forEach((r, i) => {
+    const y = padT + i * rowH;
+    const bw = Math.max(2, (r.value / maxV) * plotW);
+    ctx.fillStyle = PALETTE.ink;
+    ctx.font = SANS;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(r.label, 4, y + rowH / 2);
+    ctx.fillStyle = r.over ? PALETTE.danger : PALETTE.forest;
+    ctx.fillRect(plotX, y + 7, bw, 18);
+    ctx.fillStyle = PALETTE.ink;
+    ctx.font = MONO;
+    ctx.textAlign = 'left';
+    ctx.fillText(r.valueLabel, plotX + bw + 8, y + rowH / 2);
+  });
+}
+
+window.AHRT_CHARTS = { drawDonut, drawTargetActual, drawProjectionLine, drawCategoryBars, PALETTE };
