@@ -1,21 +1,22 @@
-// Server statis lokal untuk pengembangan situs "Anggaran Rumah Tangga Kita".
-// Menjalankan: `node serve.ts` lalu buka http://localhost:8080
-// (atau `node serve.ts --port 8081` untuk port lain).
-// Hanya melayani file di bawah app/, menolak path di luar root, dan tidak
-// melakukan apa pun yang clever: ini alat bantu lokal, bukan server internet.
+// Server statis kecil untuk app/ (Node 22, standard library saja), supaya situs
+// bisa dijalankan lokal tanpa build step:
+//   node serve.ts            -> http://localhost:8080
+//   node serve.ts --port 9000
+// Server ini hanya mengirim MIME yang dibutuhkan browser dan menolak path di
+// luar app/. Ini alat pengembangan lokal, bukan server untuk internet.
+// Tidak ada log akses, tidak ada kompresi — yang disajikan persis isi app/.
 import { createReadStream, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const appRoot = resolve(fileURLToPath(new URL('./app', import.meta.url)));
-
+const root = resolve(fileURLToPath(new URL('./app', import.meta.url)));
 const args = process.argv.slice(2);
-const flagIndex = args.indexOf('--port');
-const diminta = flagIndex === -1 ? 8080 : Number(args[flagIndex + 1]);
-const port = Number.isInteger(diminta) && diminta > 0 && diminta < 65536 ? diminta : 8080;
+const portIndex = args.indexOf('--port');
+const requested = portIndex === -1 ? 8080 : Number(args[portIndex + 1]);
+const port = Number.isInteger(requested) && requested > 0 && requested < 65536 ? requested : 8080;
 
-const TIPE_MIME = {
+const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.mjs': 'text/javascript; charset=utf-8',
@@ -29,9 +30,9 @@ const TIPE_MIME = {
   '.ico': 'image/x-icon',
 };
 
-function layani(request, response) {
+createServer((request, response) => {
   const url = new URL(request.url ?? '/', 'http://localhost');
-  let pathname;
+  let pathname: string;
   try {
     pathname = decodeURIComponent(url.pathname);
   } catch {
@@ -39,29 +40,26 @@ function layani(request, response) {
     return;
   }
   if (pathname.endsWith('/')) pathname += 'index.html';
-  const berkas = resolve(join(appRoot, normalize(pathname)));
-  if (berkas !== appRoot && !berkas.startsWith(appRoot + sep)) {
+  const file = resolve(join(root, normalize(pathname)));
+  if (file !== root && !file.startsWith(root + sep)) {
     response.writeHead(403).end('forbidden');
     return;
   }
-  let ukuran;
+  let size: number;
   try {
-    const info = statSync(berkas);
-    if (!info.isFile()) throw new Error('bukan file');
-    ukuran = info.size;
+    const stats = statSync(file);
+    if (!stats.isFile()) throw new Error('not a file');
+    size = stats.size;
   } catch {
     response.writeHead(404).end('not found');
     return;
   }
   response.writeHead(200, {
-    'content-type': TIPE_MIME[extname(berkas).toLowerCase()] ?? 'application/octet-stream',
-    'content-length': ukuran,
+    'content-type': MIME[extname(file).toLowerCase()] ?? 'application/octet-stream',
+    'content-length': size,
     'cache-control': 'no-store',
-    'x-content-type-options': 'nosniff',
   });
-  createReadStream(berkas).pipe(response);
-}
-
-createServer(layani).listen(port, '127.0.0.1', () => {
-  console.log(`Anggaran Rumah Tangga Kita: http://localhost:${port}`);
+  createReadStream(file).pipe(response);
+}).listen(port, '127.0.0.1', () => {
+  console.log(`app/ is on http://localhost:${port}`);
 });
