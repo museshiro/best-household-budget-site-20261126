@@ -1,44 +1,42 @@
-// Entry "Anggaran Rumah Tangga Kita" — best-household-budget-site-20261126-1457.
-// Menyerahkan situs: menyalin app/ dan screenshots/ dari repo ini ke direktori
-// output, lalu menulis /output/dossier.json memakai buildDossier dari
-// vendor/makefun-frontend.ts (salinan kit, tidak diubah).
-// Di luar grader, MAKEFUN_OUTPUT_DIR menggantikan /output:
-//   MAKEFUN_OUTPUT_DIR=/tmp/out-test-budget node main.ts
+// Anggaran Rumah Tangga Kita — penyerahan entry (Node 22, standard library saja).
+// Situsnya adalah file statis di app/ (index.html + CSS + JS, tanpa build step,
+// tanpa permintaan jaringan). Program ini menyalin app/ dan screenshots/ dari
+// sebelah file ini ke direktori output, lalu menulis /output/dossier.json —
+// ringkasan yang dibaca juri — dengan library make.fun yang di-vendor.
+//
+// Di luar container grader, MAKEFUN_OUTPUT_DIR menggantikan /output:
+//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+//
+// Vendor tidak disentuh: dossier.json harus byte-per-byte sama dengan yang
+// ditulis buildDossier dari vendor/makefun-frontend.ts.
 
-import { cpSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-frontend.ts';
 
-const repoRoot = fileURLToPath(new URL('.', import.meta.url));
-const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+const here = fileURLToPath(new URL('.', import.meta.url));
+const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
-function salinSumber() {
-  mkdirSync(outDir, { recursive: true });
-  cpSync(join(repoRoot, 'app'), join(outDir, 'app'), { recursive: true });
-  mkdirSync(join(outDir, 'screenshots'), { recursive: true });
-  const shots = join(repoRoot, 'screenshots');
-  if (existsSync(shots)) cpSync(shots, join(outDir, 'screenshots'), { recursive: true });
+mkdirSync(out, { recursive: true });
+cpSync(join(here, 'app'), join(out, 'app'), { recursive: true });
+mkdirSync(join(out, 'screenshots'), { recursive: true });
+if (existsSync(join(here, 'screenshots'))) {
+  cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true });
 }
 
-function laporkanIsi() {
-  const appFiles = readdirSync(join(outDir, 'app'));
-  const shotFiles = readdirSync(join(outDir, 'screenshots'))
-    .filter(f => statSync(join(outDir, 'screenshots', f)).isFile())
-    .map(f => f + ' (' + statSync(join(outDir, 'screenshots', f)).size + ' byte)');
-  console.log(`app/: ${appFiles.length} entri; screenshots/: ${shotFiles.join(', ')}`);
-}
+// Batas scorer (gate): hanya text_max_bytes yang membentuk byte dossier;
+// batas lain menolak entry yang memang akan ditolak scorer (lebih dari 4
+// screenshot atau satu di atas 256 KiB; app/ di atas 993 entri atau 16 MiB).
+// Output TIDAK pernah dihapus di sini — main.ts hanya menambah ke dalamnya.
+writeFileSync(
+  join(out, 'dossier.json'),
+  buildDossier(out, {
+    text_max_bytes: 163840,
+    screenshots: { max: 4, max_bytes: 262144 },
+    app_max_files: 993,
+    app_max_bytes: 16777216,
+  }),
+);
 
-salinSumber();
-laporkanIsi();
-
-// Batas scorer (lihat kit RULES.txt): dossier teks maks 160 KiB, maks 4 screenshot
-// @ 256 KiB, app/ maks 993 file dan 16 MiB.
-const dossier = buildDossier(outDir, {
-  text_max_bytes: 163840,
-  screenshots: { max: 4, max_bytes: 262144 },
-  app_max_files: 993,
-  app_max_bytes: 16777216,
-});
-writeFileSync(join(outDir, 'dossier.json'), dossier);
-console.log(`dossier.json ditulis: ${dossier.length} byte -> ${outDir}`);
+console.log(`dossier written to ${join(out, 'dossier.json')}`);
